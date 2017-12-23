@@ -1,0 +1,27 @@
+#! /usr/bin/env python
+
+import argparse
+import shutil
+import subprocess
+import sys
+import os
+
+from oclintscripts import environment
+from oclintscripts import path
+from oclintscripts import process
+from oclintscripts import version
+
+def build_root_dir():
+    return path.build_root
+
+def archive_file_name():
+    distribution_name = version.dev_version() + '-' + environment.dist_env()
+    return 'clang-llvm-oclint-dev-' + distribution_name
+
+def archive_file_path():
+    return os.path.join(build_root_dir(), archive_file_name())
+
+process.call('python clang co -branch ' + version.llvm_default_branch())
+process.call('python clang build -release -clean')
+process.call('cp -r ' +  build_root_dir() + '/llvm-install ' +  archive_file_path)
+process.call('tar czvf ' + archive_file_path() + '.tar.gz ' +  archive_file_path)

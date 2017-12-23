@@ -1,0 +1,35 @@
+language: cpp
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+    - os: osx
+      osx_image: xcode9
+    - os: osx
+      osx_image: xcode9.1
+    - os: osx
+      osx_image: xcode9.2
+before_install:
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+    brew install ninja;
+  else
+    sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y;
+    sudo apt-get update -q;
+    sudo apt-get install gcc-5 g++-5 -y;
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 50;
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 50;
+    sudo apt-get install ninja-build -y;
+  fi
+
+script:
+  - cd oclint-scripts
+  - cp ../gen_travis gen_travis
+  - ./gen_travis
+  - cd ..
+
+addons:
+  artifacts:
+    paths:
+      - $(ls build/clang-llvm-oclint-dev-*.tar.gz)
